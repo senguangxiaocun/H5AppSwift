@@ -6,68 +6,72 @@
     </div>
     <!-- 黑名单列表 -->
     <div class="container">
-        <div class="block-list" v-if="blocks.length > 0">
-            <div v-for="(item, index) in blocks" :key="index" class="block-item">
-                <div class="block-left">
-                    <div class="user-info">
-                        <div class="avatar-box">
-                            <div class="avatar-inner">
-                                <img :src="item.avator" alt="avatar" />
-                            </div>
-                        </div>
-                        <div class="user-name">{{ item.name }}</div>
-                    </div>
-                    <div class="user-intro">{{ item.about }}</div>
+      <div class="block-list" v-if="blocks.length > 0">
+        <div v-for="(item, index) in blocks" :key="index" class="block-item">
+          <div class="block-left">
+            <div class="user-info">
+              <div class="avatar-box">
+                <div class="avatar-inner">
+                  <img :src="item.avator" alt="avatar" />
                 </div>
-                <div class="block-right" @click="removeBlock(item.userId)">Remove</div>
+              </div>
+              <div class="user-name">{{ item.name }}</div>
             </div>
+            <div class="user-intro">{{ item.about }}</div>
+          </div>
+          <img
+            src="@/assets/cancelblockicon.png"
+            class="cancel-blockicon"
+            @click="removeBlock(item.userId)"
+          />
         </div>
-        <Empty v-else class="empty" />
+      </div>
+      <Empty v-else class="empty" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useCurrentUserStore } from '@/stores/currentUser'
-import { useUserStore } from '@/stores/user'
-import { useUIStore } from '@/stores/ui'
-import BackButton from '@/components/back.vue'
-import Empty from '@/components/empty.vue'
+import { ref, computed } from "vue";
+import { useCurrentUserStore } from "@/stores/currentUser";
+import { useUserStore } from "@/stores/user";
+import { useUIStore } from "@/stores/ui";
+import BackButton from "@/components/back.vue";
+import Empty from "@/components/empty.vue";
 
-const currentUserStore = useCurrentUserStore()
-const userStore = useUserStore()
-const uiStore = useUIStore()
+const currentUserStore = useCurrentUserStore();
+const userStore = useUserStore();
+const uiStore = useUIStore();
 
 const blocks = computed(() => {
-  return currentUserStore.currentUser?.blockList?.map(userId => {
-    // Here you can map userId to user info if you have a userStore
-    // For now we return placeholder data
-    return userStore.getUserById(userId)
-  }) || []
-})
+  return (
+    currentUserStore.currentUser?.blockList?.map((userId) => {
+      // Here you can map userId to user info if you have a userStore
+      // For now we return placeholder data
+      return userStore.getUserById(userId);
+    }) || []
+  );
+});
 
 function removeBlock(userId) {
-  const currentUser = currentUserStore.currentUser
-  if (!currentUser || !currentUser.blockList) return
+  const currentUser = currentUserStore.currentUser;
+  if (!currentUser || !currentUser.blockList) return;
 
-  if (uiStore.loading) return
-  uiStore.showLoading()
+  if (uiStore.loading) return;
+  uiStore.showLoading();
 
-  const index = currentUser.blockList.indexOf(userId)
-  
-  const delay = Math.floor(Math.random() * 1500) + 500
+  const index = currentUser.blockList.indexOf(userId);
+
+  const delay = Math.floor(Math.random() * 1500) + 500;
 
   setTimeout(() => {
-
     if (index !== -1) {
-      currentUser.blockList.splice(index, 1)
-      userStore.updateUser(currentUser.userId, { blockList: currentUser.blockList })
+      currentUser.blockList.splice(index, 1);
+      userStore.updateUser(currentUser.userId, { blockList: currentUser.blockList });
     }
 
-    uiStore.hideLoading()
-    
-  }, delay)
+    uiStore.hideLoading();
+  }, delay);
 }
 </script>
 
@@ -77,7 +81,7 @@ function removeBlock(userId) {
   width: 100%;
   height: 100vh;
   background-color: rgba(0, 0, 0, 1);
-  background-image: url('@/assets/pagebgc.png');
+  background-image: url("@/assets/pagebgc.png");
   background-size: cover; /* 等比缩放覆盖 */
   background-position: center; /* 居中显示 */
   background-repeat: no-repeat;
@@ -95,10 +99,10 @@ function removeBlock(userId) {
 }
 
 .edit-title {
-  font-family: 'YesevaOne', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: calc(100vw * 20 / 375);
-  font-weight: 400;
-  background: linear-gradient(135deg, rgba(255, 159, 142, 1) 0%, rgba(241, 213, 160, 1) 32.13%, rgba(201, 255, 221, 1) 67.84%, rgba(157, 255, 255, 1) 100%);
+  font-weight: 700;
+  background: rgb(0, 0, 0);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -124,7 +128,7 @@ function removeBlock(userId) {
   align-items: center;
   height: calc(100vh * 76 / 812);
   border-radius: calc(100vw * 20 / 375);
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(245, 245, 245, 1);
   box-shadow: 0px calc(100vw * 2 / 375) calc(100vw * 4 / 375) rgba(0, 0, 0, 0.06);
   padding: 0 calc(100vw * 16 / 375);
   box-sizing: border-box;
@@ -151,7 +155,6 @@ function removeBlock(userId) {
   height: calc(100vw * 32 / 375);
   border-radius: 50%;
   padding: calc(100vw * 1 / 375);
-  background: linear-gradient(135deg, rgba(255, 159, 142, 1) 0%, rgba(241, 213, 160, 1) 32.13%, rgba(201, 255, 221, 1) 67.84%, rgba(157, 255, 255, 1) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -167,22 +170,22 @@ function removeBlock(userId) {
 }
 
 .user-name {
-  font-family: 'YesevaOne', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: calc(100vw * 16 / 375);
   font-weight: 400;
   line-height: calc(100vw * 18.48 / 375);
-  color: #fff;
+  color: #000000;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .user-intro {
-  font-family: 'Archivo', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: calc(100vw * 14 / 375);
   font-weight: 400;
   line-height: calc(100vw * 15.23 / 375);
-  color: #fff;
+  color: #000000;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -193,7 +196,7 @@ function removeBlock(userId) {
   height: calc(100vh * 28 / 812);
   border-radius: calc(100vw * 20 / 375);
   background: #fff;
-  font-family: 'Archivo', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: calc(100vw * 12 / 375);
   font-weight: 400;
   line-height: calc(100vw * 13.06 / 375);
@@ -208,5 +211,10 @@ function removeBlock(userId) {
   align-items: center;
   justify-content: center;
   height: 100%;
+}
+
+.cancel-blockicon {
+  width: calc(100vw * 24 / 375);
+  height: calc(100vh * 24 / 812);
 }
 </style>

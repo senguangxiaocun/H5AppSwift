@@ -1,7 +1,5 @@
 <template>
   <div class="page">
-    <div class="aiusermodel"></div>
-    <div class="aichatmodel"></div>
     <div class="page-container">
       <!-- top -->
       <div class="top-section">
@@ -23,20 +21,20 @@
         <div class="bottom-scroll">
           <div v-for="(item, index) in bottomItems" :key="index" class="chat-item">
             <div class="chat-choose" v-if="item.sendId === '0'">
-                <div class="chat-time">{{ item.time }}</div>
-                    <div class="chat-content">
-                    <img class="chat-avatar" src="@/assets/aiavator.png" alt="AI Avatar" />
-                    <div class="chat-message">{{ item.message }}</div>
-                </div>
+              <div class="chat-time">{{ item.time }}</div>
+              <div class="chat-content">
+                <img class="chat-avatar" src="@/assets/aiavator.png" alt="AI Avatar" />
+                <div class="chat-message">{{ item.message }}</div>
+              </div>
             </div>
             <div class="chat-choose" v-else>
-                <div class="chat-time">{{ item.time }}</div>
-                    <div class="chat-content-rigth">
-                    <div class="chat-message-rigth">{{ item.message }}</div>
-                    <div class="chat-avatar-rigth">
-                      <img :src="currentUserStore.currentUser.avator" alt="AI Avatar" />
-                    </div>
+              <div class="chat-time">{{ item.time }}</div>
+              <div class="chat-content-rigth">
+                <div class="chat-message-rigth">{{ item.message }}</div>
+                <div class="chat-avatar-rigth">
+                  <img :src="currentUserStore.currentUser.avator" alt="AI Avatar" />
                 </div>
+              </div>
             </div>
           </div>
         </div>
@@ -46,129 +44,136 @@
     <!-- bottom input box -->
     <div class="bottom-input">
       <input type="text" placeholder="Say something" v-model="chatInput" />
-      <img class="send-icon" src="@/assets/commentsend.png" alt="Send" @click="sendMessage" />
+      <img
+        class="send-icon"
+        src="@/assets/commentsend.png"
+        alt="Send"
+        @click="sendMessage"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import BackButton from '@/components/back.vue'
-import { useCurrentUserStore } from '@/stores/currentUser'
-import { useUIStore } from '@/stores/ui'
-import { aiChat } from '@/utils/ai'
-import { decryptAES } from '@/utils/aes'
+import { ref } from "vue";
+import BackButton from "@/components/back.vue";
+import { useCurrentUserStore } from "@/stores/currentUser";
+import { useUIStore } from "@/stores/ui";
+import { aiChat } from "@/utils/ai";
+import { decryptAES } from "@/utils/aes";
 
 const messages = ref([
   "I'm feeling great today.",
   "Do you like reading?",
-  "Can you comfort me?"
-])
+  "Can you comfort me?",
+]);
 
-const currentUserStore = useCurrentUserStore()
-const uiStore = useUIStore()
+const currentUserStore = useCurrentUserStore();
+const uiStore = useUIStore();
 
 const getFirstTime = () => {
-  const key = 'chat_first_time'
-  const saved = localStorage.getItem(key)
+  const key = "chat_first_time";
+  const saved = localStorage.getItem(key);
 
-  if (saved) return saved
+  if (saved) return saved;
 
-  const now = new Date()
-  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) // 12:00
-  localStorage.setItem(key, time)
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); // 12:00
+  localStorage.setItem(key, time);
 
-  return time
-}
+  return time;
+};
 
 const bottomItems = ref([
-  { sendId: '0', time: getFirstTime(), message: 'Hi there! I’m Kico, your AI buddy for all things fun and creative.' },
-])
+  {
+    sendId: "0",
+    time: getFirstTime(),
+    message: "Hi there! I’m Kico, your AI buddy for all things fun and creative.",
+  },
+]);
 
 async function handleMessageClick(message) {
-  const now = new Date()
-  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   bottomItems.value.push({
     sendId: currentUserStore.currentUser.id,
     time,
-    message: message
-  })
+    message: message,
+  });
 
-  if (uiStore.loading) return
-  uiStore.showLoading()
+  if (uiStore.loading) return;
+  uiStore.showLoading();
 
   try {
-    const res = await aiChat(message)
+    const res = await aiChat(message);
 
-    uiStore.hideLoading()
+    uiStore.hideLoading();
 
-    if (res.data.code === '0000') {
+    if (res.data.code === "0000") {
       // 1 解密
-      const decryptText = decryptAES(res.data.result)
+      const decryptText = decryptAES(res.data.result);
       // 2 转 JSON
-      const data = JSON.parse(decryptText)
-      const aiMessage = data?.output?.choices?.[0]?.message?.content || ''
-      
+      const data = JSON.parse(decryptText);
+      const aiMessage = data?.output?.choices?.[0]?.message?.content || "";
+
       // 然后 push 到聊天列表
       bottomItems.value.push({
-        sendId: '0',           // AI
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        message: aiMessage
-      })
+        sendId: "0", // AI
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        message: aiMessage,
+      });
     } else {
-      uiStore.showToast(res.data.message)
+      uiStore.showToast(res.data.message);
     }
-
   } catch (err) {
-    uiStore.hideLoading()
-    uiStore.showToast('Network error')
+    uiStore.hideLoading();
+    uiStore.showToast("Network error");
   }
 }
 
-const chatInput = ref('')
+const chatInput = ref("");
 
 async function sendMessage() {
-  const text = chatInput.value.trim()
-  if (!text) return
+  const text = chatInput.value.trim();
+  if (!text) return;
 
-  const now = new Date()
-  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const now = new Date();
+  const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   bottomItems.value.push({
     sendId: currentUserStore.currentUser.id,
     time,
-    message: text
-  })
+    message: text,
+  });
 
-  if (uiStore.loading) return
-  uiStore.showLoading()
+  if (uiStore.loading) return;
+  uiStore.showLoading();
   try {
-    const res = await aiChat(text)
+    const res = await aiChat(text);
 
-    uiStore.hideLoading()
+    uiStore.hideLoading();
 
-    if (res.data.code === '0000') {
+    if (res.data.code === "0000") {
       // 1 解密
-      const decryptText = decryptAES(res.data.result)
+      const decryptText = decryptAES(res.data.result);
       // 2 转 JSON
-      const data = JSON.parse(decryptText)
-      const aiMessage = data?.output?.choices?.[0]?.message?.content || ''
-      
+      const data = JSON.parse(decryptText);
+      const aiMessage = data?.output?.choices?.[0]?.message?.content || "";
+
       // 然后 push 到聊天列表
       bottomItems.value.push({
-        sendId: '0',           // AI
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        message: aiMessage
-      })
+        sendId: "0", // AI
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        message: aiMessage,
+      });
 
-      chatInput.value = ""
+      chatInput.value = "";
     } else {
-      uiStore.showToast(res.data.message)
+      uiStore.showToast(res.data.message);
     }
-
   } catch (err) {
-    uiStore.hideLoading()
-    uiStore.showToast('Network error')
+    uiStore.hideLoading();
+    uiStore.showToast("Network error");
   }
 }
 </script>
@@ -179,7 +184,7 @@ async function sendMessage() {
   height: 100vh;
   overflow: hidden; /* prevent scrolling */
   background-color: #000; /* black background */
-  background-image: url('@/assets/aibgc.png'); /* replace with your asset filename */
+  background-image: url("@/assets/aibgc2.png"); /* replace with your asset filename */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -192,7 +197,7 @@ async function sendMessage() {
   width: calc(100vw * 179 / 375);
   height: calc(100vh * 314 / 812);
   opacity: 1;
-  background-image: url('@/assets/aiusermodel.png'); 
+  background-image: url("@/assets/aiusermodel.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -206,7 +211,7 @@ async function sendMessage() {
   width: calc(100vw * 104 / 375);
   height: calc(100vh * 38 / 812);
   opacity: 1;
-  background-image: url('@/assets/aichatmodel.png'); 
+  background-image: url("@/assets/aichatmodel.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -222,7 +227,7 @@ async function sendMessage() {
 
 .center-section {
   margin-top: calc(100vh * 41 / 812);
-  margin-left: calc(100vw * 187 / 375);
+  margin-left: calc(100vw * 20 / 375);
   margin-right: calc(100vw * 28 / 375);
   display: flex;
   flex-direction: column;
@@ -237,7 +242,7 @@ async function sendMessage() {
   border-radius: calc(100vw * 40 / 375);
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(calc(100vw * 4 / 375));
-  font-family: 'Archivo', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: calc(100vw * 14 / 375);
   font-weight: 400;
   line-height: calc(100vw * 15.23 / 375);
@@ -255,9 +260,8 @@ async function sendMessage() {
   left: 0;
   right: 0;
   bottom: 0;
-  top: calc(100vh * 325 / 812); /* adjust top spacing as needed */
+  top: calc(100vh * 280 / 812); /* adjust top spacing as needed */
   background: rgba(255, 255, 255, 1);
-  border-radius: calc(100vw * 40 / 375) calc(100vw * 40 / 375) 0 0;
   z-index: 2;
 }
 
@@ -294,12 +298,12 @@ async function sendMessage() {
 
 .chat-time {
   text-align: center;
-  font-family: 'Archivo', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: calc(100vw * 16 / 375);
   font-weight: 400;
   line-height: calc(100vw * 17.41 / 375);
   letter-spacing: 0;
-  color: rgba(105, 71, 65, 1);
+  color: rgba(31, 40, 0, 0.3);
 }
 
 .chat-content {
@@ -320,18 +324,17 @@ async function sendMessage() {
 }
 
 .chat-avatar {
-  width: calc(100vw * 44 / 375);
-  height: calc(100vw * 44 / 375);
+  width: calc(100vw * 40 / 375);
+  height: calc(100vw * 40 / 375);
   border-radius: 50%;
 }
 
 .chat-avatar-rigth {
-  width: calc(100vw * 44 / 375);
-  height: calc(100vw * 44 / 375);
+  width: calc(100vw * 40 / 375);
+  height: calc(100vw * 40 / 375);
   flex-shrink: 0;
   border-radius: 50%; /* fully circular */
   padding: calc(100vw * 1 / 375); /* border thickness */
-  background: linear-gradient(135deg, rgba(255, 159, 142, 1) 0%, rgba(241, 213, 160, 1) 32.13%, rgba(201, 255, 221, 1) 67.84%, rgba(157, 255, 255, 1) 100%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -350,35 +353,35 @@ async function sendMessage() {
 }
 
 .chat-message {
-  border-radius: 0 calc(100vw * 10 / 375) calc(100vw * 10 / 375) calc(100vw * 10 / 375);
-  background: rgba(255, 159, 142, 1);
+  border-radius: calc(100vw * 20 / 375);
+  background: rgba(201, 238, 64, 1);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   padding: calc(100vh * 10 / 812) calc(100vw * 10 / 375);
-  font-family: 'Archivo', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: calc(100vw * 14 / 375);
   font-weight: 400;
   line-height: calc(100vw * 15.23 / 375);
   letter-spacing: 0;
-  color: rgba(255, 255, 255, 1);
+  color: rgb(0, 0, 0);
 }
 
 .chat-message-rigth {
-  border-radius: calc(100vw * 10 / 375) 0 calc(100vw * 10 / 375) calc(100vw * 10 / 375);
-  background: rgba(201, 255, 221, 1);
+  border-radius: calc(100vw * 20 / 375);
+  background: rgba(31, 40, 0, 1);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   padding: calc(100vh * 10 / 812) calc(100vw * 10 / 375);
-  font-family: 'Archivo', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: calc(100vw * 14 / 375);
   font-weight: 400;
   line-height: calc(100vw * 15.23 / 375);
   letter-spacing: 0;
-  color: rgba(105, 71, 65, 1);
+  color: rgb(255, 255, 255);
 }
 
 .bottom-input {
@@ -386,15 +389,15 @@ async function sendMessage() {
   left: calc(100vw * 20 / 375);
   right: calc(100vw * 20 / 375);
   bottom: calc(100vh * 29 / 812);
-  height: calc(100vh * 54 / 812);
+  height: calc(100vh * 50 / 812);
   display: flex;
   align-items: center;
   gap: calc(100vw * 10 / 375);
-  background: rgba(201, 255, 221, 1);
+  background: rgba(245, 245, 245, 1);
   border-radius: calc(100vw * 40 / 375);
   backdrop-filter: blur(calc(100vw * 32 / 375));
   box-sizing: border-box;
-  padding: 0 calc(100vw * 16 / 375);
+  padding: 0 0 0 calc(100vw * 16 / 375);
   z-index: 200;
 }
 
@@ -407,8 +410,8 @@ async function sendMessage() {
   font-weight: 400;
   line-height: calc(100vw * 15.23 / 375);
   letter-spacing: 0;
-  font-family: 'Archivo', sans-serif;
-  color: rgba(0,0,0,1);
+  font-family: "Poppins", sans-serif;
+  color: rgba(0, 0, 0, 1);
 }
 
 .bottom-input input::placeholder {
@@ -416,13 +419,13 @@ async function sendMessage() {
   font-weight: 400;
   line-height: calc(100vw * 15.23 / 375);
   letter-spacing: 0;
-  font-family: 'Archivo', sans-serif;
-  color: rgba(105, 71, 65, 1);
+  font-family: "Poppins", sans-serif;
+  color: rgba(31, 40, 0, 0.4);
 }
 
 .send-icon {
-  width: calc(100vw * 30 / 375);
-  height: calc(100vw * 30 / 375);
+  width: calc(100vw * 50 / 375);
+  height: calc(100vw * 50 / 375);
   cursor: pointer;
 }
 </style>

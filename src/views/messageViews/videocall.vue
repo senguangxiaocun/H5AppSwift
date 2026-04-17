@@ -7,48 +7,45 @@
         <img :src="userInfo.avator" alt="User Avatar" />
       </div>
     </div>
-
+    <div class="call-left">
+      <div class="user-name">{{ userInfo.name }}</div>
+      <div class="calling-text">{{ callingText }}</div>
+    </div>
     <!-- Bottom Control Panel -->
-    <div class="call-panel">
-      <div class="call-left">
-        <div class="user-name">{{ userInfo.name }}</div>
-        <div class="calling-text">{{ callingText }}</div>
-      </div>
-      <div class="hangup-btn" @click="hangup">
-        <img src="@/assets/hangupicon.png" alt="hangup" />
-      </div>
+    <div class="hangup-btn" @click="hangup">
+      <img src="@/assets/hangupicon.png" alt="hangup" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, onMounted, onUnmounted } from 'vue'
-import { useUserStore } from '@/stores/user'
+import { defineProps, defineEmits, ref, onMounted, onUnmounted } from "vue";
+import { useUserStore } from "@/stores/user";
 
-const props = defineProps({ userId: String })
-const emits = defineEmits(['hangup'])
+const props = defineProps({ userId: String });
+const emits = defineEmits(["hangup"]);
 
-const userStore = useUserStore()
-const userInfo = userStore.getUserById(props.userId)
+const userStore = useUserStore();
+const userInfo = userStore.getUserById(props.userId);
 
-const callingText = ref('Calling')
-let dotCount = 0
-let intervalId = null
+const callingText = ref("Calling");
+let dotCount = 0;
+let intervalId = null;
 
 onMounted(() => {
   intervalId = setInterval(() => {
-    dotCount = (dotCount + 1) % 4
-    callingText.value = 'Calling' + '.'.repeat(dotCount)
-  }, 1000)
-})
+    dotCount = (dotCount + 1) % 4;
+    callingText.value = "Calling" + ".".repeat(dotCount);
+  }, 1000);
+});
 
 onUnmounted(() => {
-  clearInterval(intervalId)
-})
+  clearInterval(intervalId);
+});
 
 function hangup() {
-  clearInterval(intervalId)
-  emits('hangup')
+  clearInterval(intervalId);
+  emits("hangup");
 }
 </script>
 
@@ -65,7 +62,7 @@ function hangup() {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(0deg, rgba(255, 159, 142, 1) 0%, rgba(255, 255, 255, 0) 99.84%);
+  background: linear-gradient(0deg, rgb(255, 255, 255) 0%, rgba(255, 255, 255, 0) 99.84%);
   z-index: 0;
 }
 
@@ -84,9 +81,9 @@ function hangup() {
 
 .avatar-outer {
   margin-top: calc(100vh * 257 / 812);
-  width: calc(100vw * 166 / 375);
-  height: calc(100vw * 166 / 375);
-  border-radius: calc(100vw * 50 / 375);
+  width: calc(100vw * 80 / 375);
+  height: calc(100vw * 80 / 375);
+  border-radius: 50%;
   background: rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
@@ -94,11 +91,10 @@ function hangup() {
 }
 
 .avatar-inner {
-  width: calc(100vw * 144 / 375);
-  height: calc(100vw * 144 / 375);
-  border-radius: calc(100vw * 40 / 375);
+  width: calc(100vw * 80 / 375);
+  height: calc(100vw * 80 / 375);
+  border-radius: 50%;
   padding: calc(100vw * 3 / 375);
-  background: linear-gradient(135deg, rgba(255, 159, 142, 1) 0%, rgba(241, 213, 160, 1) 32.13%, rgba(201, 255, 221, 1) 67.84%, rgba(157, 255, 255, 1) 100%);
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -110,7 +106,7 @@ function hangup() {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: calc(100vw * 37 / 375);
+  border-radius: 50%;
   display: block;
 }
 
@@ -137,11 +133,11 @@ function hangup() {
 }
 
 .user-name {
-  font-family: 'YesevaOne', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: calc(100vw * 20 / 375);
-  font-weight: 400;
+  font-weight: 700;
   line-height: calc(100vw * 23.1 / 375);
-  color: rgba(74, 32, 25, 1);
+  color: rgb(0, 0, 0);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -151,17 +147,19 @@ function hangup() {
   font-size: calc(100vw * 14 / 375);
   font-weight: 400;
   line-height: calc(100vw * 15.23 / 375);
-  color: rgba(74, 32, 25, 1);
+  color: rgba(31, 40, 0, 0.6);
+  padding-left: calc(100vw * 20 / 375);
 }
 
 .hangup-btn {
-  width: calc(100vw * 60 / 375);
-  height: calc(100vw * 60 / 375);
+  width: calc(100vw * 72 / 375);
+  height: calc(100vw * 72 / 375);
   border-radius: calc(100vw * 214 / 375);
-  background: rgba(255, 28, 100, 1);
+  background: rgba(255, 87, 51, 1);
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: calc(100vw * 60 / 375);
 }
 
 .hangup-btn img {

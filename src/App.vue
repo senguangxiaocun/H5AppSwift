@@ -1,7 +1,7 @@
 <script setup>
-import { useUIStore } from '@/stores/ui'
+import { useUIStore } from "@/stores/ui";
 
-const uiStore = useUIStore()
+const uiStore = useUIStore();
 </script>
 
 <template>
@@ -11,7 +11,7 @@ const uiStore = useUIStore()
     <!-- 全局 loading -->
     <div v-if="uiStore.loading" class="loading-mask">
       <div class="loading-box">
-        <van-loading type="spinner" size="32px" color="#fff" />
+        <van-loading type="spinner" size="32px" color="#000" />
       </div>
     </div>
 
@@ -29,7 +29,7 @@ const uiStore = useUIStore()
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.5); /* 半透明遮罩 */
+  background: rgba(0, 0, 0, 0.5); /* 半透明遮罩 */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -37,10 +37,10 @@ const uiStore = useUIStore()
 }
 
 .loading-box {
-  width: calc(100vw * 80 / 375);
-  height: calc(100vw * 80 / 375);
+  width: calc(100vw * 60 / 375);
+  height: calc(100vw * 60 / 375);
   border-radius: calc(100vw * 20 / 812);
-  background: rgba(0,0,0,1); /* 黑色小背景 */
+  background: rgb(255, 255, 255); /* 黑色小背景 */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,7 +51,7 @@ const uiStore = useUIStore()
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(0,0,0,0.7);
+  background: rgba(0, 0, 0, 0.7);
   color: #fff;
   padding: calc(100vh * 12 / 812) calc(100vw * 24 / 375);
   border-radius: calc(100vw * 12 / 375);

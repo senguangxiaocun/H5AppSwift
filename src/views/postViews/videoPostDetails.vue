@@ -30,216 +30,276 @@
       <!-- 顶部按钮 -->
       <div class="top-actions">
         <BackButton />
-        <MoreButton v-if="post.userId !== currentUserStore.currentUser.userId" @click="showPostReport = true" />
       </div>
 
       <!-- 底部信息 -->
-      <div class="bottom-info">
-        <div class="user-left"> 
-          <div class="avatar-wrap">
-            <div class="avatar" @click="goOtherHome(post.userId)">
-              <img :src="postUser && postUser.avator" alt="avatar" />
+      <div>
+        <div class="bottom-info">
+          <div class="user-left">
+            <div class="avatar-wrap">
+              <div class="avatar" @click="goOtherHome(post.userId)">
+                <img :src="postUser && postUser.avator" alt="avatar" />
+              </div>
+              <div
+                class="follow"
+                v-if="
+                  post.userId !== currentUserStore.currentUser.userId &&
+                  !currentUserStore.currentUser.follow.includes(post.userId)
+                "
+                @click="showGoToLoginFollow"
+              >
+                <img src="@/assets/follow.png" alt="follow" />
+              </div>
             </div>
-            <div class="follow" v-if="post.userId !== currentUserStore.currentUser.userId && !currentUserStore.currentUser.follow.includes(post.userId)" @click="handleFollow" >
-              <img src="@/assets/follow.png" alt="follow" />
-            </div>
-          </div>
 
-          <div class="user-text">
-            <div class="username"  @click="goOtherHome(post.userId)">{{ postUser && postUser.name }}</div>
-            <div class="video-desc">{{ post && post.dynamicDesc }}</div>
+            <div class="user-text">
+              <div class="username" @click="goOtherHome(post.userId)">
+                {{ postUser && postUser.name }}
+              </div>
+              <div class="video-desc">{{ post && post.dynamicDesc }}</div>
+            </div>
+
+            <MoreButton
+              v-if="post.userId !== currentUserStore.currentUser.userId"
+              @click="sendShowToastToIOS(post.userId)"
+            />
+          </div>
+        </div>
+        <!-- 喜欢、评论数 -->
+        <div class="action-buttons">
+          <div class="action-button" @click="uiStore.openComment()">
+            <img src="@/assets/chaticon.png" alt="comment" />
+            <span>{{ post.dynamicCommentCount }}</span>
+          </div>
+          <div class="action-button" @click="showGoToLoginLike">
+            <img
+              v-if="currentUserStore.currentUser.postLikeIds.includes(post.dynamicId)"
+              src="@/assets/likepic.png"
+              alt="like"
+            />
+            <img v-else src="@/assets/dislikepic.png" alt="like" />
+            <span>{{
+              post.dynamicLikeCount +
+              (currentUserStore.currentUser.postLikeIds.includes(post.dynamicId) ? 1 : 0)
+            }}</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 喜欢、评论数 -->
-    <div class="action-buttons">
-      <div class="action-button" @click="toggleLike">
-        <img v-if="currentUserStore.currentUser.postLikeIds.includes(post.dynamicId)" src="@/assets/likepic.png" alt="like" />
-        <img v-else src="@/assets/dislikepic.png" alt="like" />
-        <span>{{post.dynamicLikeCount + (currentUserStore.currentUser.postLikeIds.includes(post.dynamicId) ? 1 : 0) }}</span>
-      </div>
-      <div class="action-button" @click="uiStore.openComment()">
-        <img src="@/assets/chaticon.png" alt="comment" />
-        <span>{{ post.dynamicCommentCount }}</span>
-      </div>
-    </div>
-
     <!-- 评论弹窗（底部弹出） -->
-    <div v-if="uiStore.showComment" class="comment-overlay" @click.self="uiStore.closeComment()">
+    <div
+      v-if="uiStore.showComment"
+      class="comment-overlay"
+      @click.self="uiStore.closeComment()"
+    >
       <div class="comment-sheet">
-        <Comment :postId="postId" :reportAction="commentAction" @openCommentReport="showCommentReport = true" />
+        <Comment
+          :postId="postId"
+          :reportAction="commentAction"
+          @openCommentReport="showCommentReport = true"
+        />
       </div>
     </div>
-    <ReportDialog v-if="showPostReport" @close="showPostReport = false" @select="postReportSelect" >
+    <ReportDialog
+      v-if="showPostReport"
+      @close="showPostReport = false"
+      @select="postReportSelect"
+    >
     </ReportDialog>
-    <ReportDialog v-if="showCommentReport" @close="showCommentReport = false" @select="commentReportSelect" >
+    <ReportDialog
+      v-if="showCommentReport"
+      @close="showCommentReport = false"
+      @select="commentReportSelect"
+    >
     </ReportDialog>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { usePostStore } from '@/stores/post'
-import { useUserStore } from '@/stores/user'
-import { useCurrentUserStore } from '@/stores/currentUser'
-import { useUIStore } from '@/stores/ui'
-import { onMounted, onBeforeUnmount } from 'vue'
-import BackButton from '@/components/back.vue'
-import MoreButton from '@/components/more.vue'
-import Comment from '@/views/postViews/comment.vue'
-import ReportDialog from '@/components/reportChoose.vue'
-import { goBackOrClose } from '@/utils/iosBridge'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { usePostStore } from "@/stores/post";
+import { useUserStore } from "@/stores/user";
+import { useCurrentUserStore } from "@/stores/currentUser";
+import { useUIStore } from "@/stores/ui";
+import { onMounted, onBeforeUnmount } from "vue";
+import BackButton from "@/components/back.vue";
+import MoreButton from "@/components/more.vue";
+import Comment from "@/views/postViews/comment.vue";
+import ReportDialog from "@/components/reportChoose.vue";
+import { goBackOrClose, sendShowToastToIOS } from "@/utils/iosBridge";
+
+// 游客关注限制
+function showGoToLoginFollow() {
+  if (currentUserStore.currentUser.isguest == 1) {
+    sendShowToastToIOS("guestLogin");
+    return;
+  }
+  handleFollow();
+}
+
+// 游客喜欢限制
+function showGoToLoginLike() {
+  if (currentUserStore.currentUser.isguest == 1) {
+    sendShowToastToIOS("guestLogin");
+    return;
+  }
+  toggleLike();
+}
 
 const { postId } = defineProps({
   postId: {
     type: [String, Number],
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const postStore = usePostStore()
-const post = postStore.getPostById(postId)
+const postStore = usePostStore();
+const post = postStore.getPostById(postId);
 
-const userStore =  useUserStore()
-const postUser = userStore.getUserById(post.userId)
+const userStore = useUserStore();
+const postUser = userStore.getUserById(post.userId);
 
-const videoRef = ref(null)
-const isPaused = ref(false)
+const videoRef = ref(null);
+const isPaused = ref(false);
 
-const currentUserStore = useCurrentUserStore()
-const router = useRouter()
-const uiStore = useUIStore()
+const currentUserStore = useCurrentUserStore();
+const router = useRouter();
+const uiStore = useUIStore();
 
 function togglePlay() {
-  const video = videoRef.value
-  if (!video) return
+  const video = videoRef.value;
+  if (!video) return;
 
   if (video.paused) {
-    video.play()
-    isPaused.value = false
+    video.play();
+    isPaused.value = false;
   } else {
-    video.pause()
-    isPaused.value = true
+    video.pause();
+    isPaused.value = true;
   }
 }
 
 onMounted(() => {
-  const video = videoRef.value
+  const video = videoRef.value;
   if (video) {
-    video.play().then(() => {
-      isPaused.value = false
-    }).catch(() => {
-      isPaused.value = true
-    })
+    video
+      .play()
+      .then(() => {
+        isPaused.value = false;
+      })
+      .catch(() => {
+        isPaused.value = true;
+      });
   }
-})
+});
 
 onBeforeUnmount(() => {
-  const video = videoRef.value
+  const video = videoRef.value;
   if (video) {
-    video.pause()
+    video.pause();
   }
-})
+});
 
 //帖子举报、拉黑
-const showPostReport = ref(false)
+const showPostReport = ref(false);
 function postReportSelect(value) {
-  showPostReport.value = false
+  showPostReport.value = false;
   if (value === 0) {
-    router.push({ name: 'report' })
+    router.push({ name: "report" });
   } else if (value === 1) {
     //用户选择屏蔽
-    if (uiStore.loading) return
-    uiStore.showLoading()
+    if (uiStore.loading) return;
+    uiStore.showLoading();
 
-    const postUserId = post.userId
+    const postUserId = post.userId;
 
     // 用户选择屏蔽时加入 blockList
     if (postUserId) {
-      const blockList = currentUserStore.currentUser.blockList || []
+      const blockList = currentUserStore.currentUser.blockList || [];
 
       // 不存在才加入，避免重复
       if (!blockList.includes(postUserId)) {
-        blockList.unshift(postUserId)
+        blockList.unshift(postUserId);
 
         // 使用 userStore 公共方法同步更新当前用户并回传 iOS
-        userStore.updateUser(currentUserStore.currentUser.userId, { blockList: blockList })
+        userStore.updateUser(currentUserStore.currentUser.userId, {
+          blockList: blockList,
+        });
       }
     }
 
-    const delay = Math.floor(Math.random() * 1500) + 500
+    const delay = Math.floor(Math.random() * 1500) + 500;
 
     setTimeout(() => {
-      uiStore.hideLoading()
-      uiStore.showToast('Blocking successful')
+      uiStore.hideLoading();
+      uiStore.showToast("Blocking successful");
 
-      goBackOrClose()
-
-    }, delay)
+      goBackOrClose();
+    }, delay);
   }
 }
 
 // Handle follow action
 function handleFollow() {
-  const currentUserId = currentUserStore.currentUser.userId
-  const postUserId = post.userId
+  const currentUserId = currentUserStore.currentUser.userId;
+  const postUserId = post.userId;
 
   // Update current user's follow list
-  const currentUserFollow = currentUserStore.currentUser.follow ? [...currentUserStore.currentUser.follow] : []
+  const currentUserFollow = currentUserStore.currentUser.follow
+    ? [...currentUserStore.currentUser.follow]
+    : [];
   if (!currentUserFollow.includes(postUserId)) {
-    currentUserFollow.unshift(postUserId)
+    currentUserFollow.unshift(postUserId);
   }
 
   // Update post user's fans list
-  const postUserFans = postUser.fans ? [...postUser.fans] : []
+  const postUserFans = postUser.fans ? [...postUser.fans] : [];
   if (!postUserFans.includes(currentUserId)) {
-    postUserFans.unshift(currentUserId)
+    postUserFans.unshift(currentUserId);
   }
 
   // Update current user store and user store
-  userStore.updateUser(currentUserId, { follow: currentUserFollow })
+  userStore.updateUser(currentUserId, { follow: currentUserFollow });
 
-  userStore.updateUser(postUserId, { fans: postUserFans })
-  
-  uiStore.showToast('Followed successfully')
+  userStore.updateUser(postUserId, { fans: postUserFans });
+
+  uiStore.showToast("Followed successfully");
 }
 
 // 点击用户头像跳转到用户主页
 function goOtherHome(userId) {
-  if (!userId) return
-  router.push({ name: 'otherHome', params: { userId } })
+  if (!userId) return;
+  router.push({ name: "otherHome", params: { userId } });
 }
 
 // 点赞逻辑
 function toggleLike() {
-  const postLikeIds = currentUserStore.currentUser.postLikeIds
+  const postLikeIds = currentUserStore.currentUser.postLikeIds;
   // 判断当前用户是否已经点赞
-  const likedIndex = postLikeIds.indexOf(postId)
+  const likedIndex = postLikeIds.indexOf(postId);
 
   if (likedIndex === -1) {
     // 未点赞，添加postId到postLikeIds
-    postLikeIds.push(postId)
+    postLikeIds.push(postId);
   } else {
     // 已点赞，移除postId
-    postLikeIds.splice(likedIndex, 1)
+    postLikeIds.splice(likedIndex, 1);
     // 点赞数不减少，保持原有逻辑
   }
 
   // 同步更新userStore，并回传iOS
-  userStore.updateUser(currentUserStore.currentUser.userId, { postLikeIds: postLikeIds })
+  userStore.updateUser(currentUserStore.currentUser.userId, { postLikeIds: postLikeIds });
 }
 
 //评论举报、拉黑显示
-const showCommentReport = ref(false)
-const commentAction = ref(null) // 保存 0 或 1
+const showCommentReport = ref(false);
+const commentAction = ref(null); // 保存 0 或 1
 
 function commentReportSelect(value) {
-  commentAction.value = value  // 保存选择
-  showCommentReport.value = false
+  commentAction.value = value; // 保存选择
+  showCommentReport.value = false;
 }
 </script>
 
@@ -281,7 +341,7 @@ function commentReportSelect(value) {
   pointer-events: none;
   transform: rotate(180deg);
 }
- 
+
 .content {
   position: absolute;
   top: 0;
@@ -310,9 +370,12 @@ function commentReportSelect(value) {
 }
 
 /* re-enable pointer-events for interactive children */
-.top-actions, .top-actions *,
-.bottom-info, .bottom-info *,
-.follow, .follow * {
+.top-actions,
+.top-actions *,
+.bottom-info,
+.bottom-info *,
+.follow,
+.follow * {
   pointer-events: auto;
 }
 
@@ -325,6 +388,7 @@ function commentReportSelect(value) {
 .bottom-info {
   display: flex;
   align-items: center;
+  padding-bottom: calc(100vw * 20 / 375);
 }
 
 .user-left {
@@ -338,13 +402,6 @@ function commentReportSelect(value) {
   height: calc(100vw * 48 / 375);
   border-radius: 50%;
   padding: calc(100vw * 1 / 375); /* border thickness */
-  background: linear-gradient(
-    135deg,
-    rgba(255, 159, 142, 1) 0%,
-    rgba(241, 213, 160, 1) 32.13%,
-    rgba(201, 255, 221, 1) 67.84%,
-    rgba(157, 255, 255, 1) 100%
-  );
   box-sizing: border-box;
   overflow: hidden;
   display: flex;
@@ -373,14 +430,13 @@ function commentReportSelect(value) {
   left: 50%;
   bottom: 0;
   transform: translateX(-50%);
-  width: calc(100vw * 36 / 375);
-  height: calc(100vw * 14 / 375);
-  border-radius: calc(100vw * 40 / 375);
+  width: calc(100vw * 20 / 375);
+  height: calc(100vw * 20 / 375);
+  border-radius: calc(100vw * 20 / 375);
   background: rgba(255, 255, 255, 1);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset calc(100vw * -1 / 375) calc(100vw * -1 / 375) calc(100vw * 1 / 375) rgba(255, 255, 255, 0.6), inset calc(100vw * 1 / 375) calc(100vw * 1 / 375) calc(100vw * 1 / 375) rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(10px);
   cursor: pointer;
 }
@@ -397,62 +453,73 @@ function commentReportSelect(value) {
 }
 
 .username {
-  font-family: 'YesevaOne', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: calc(100vw * 16 / 375);
-  font-weight: 400;
+  font-weight: 600;
   line-height: calc(100vw * 18.48 / 375);
   color: rgba(255, 255, 255, 1);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: calc(100vw - calc(100vw * 48 / 375) - calc(100vw * 16 / 375) - calc(100vw * 40 / 375)); /* avatar width + gap + padding */
+  max-width: calc(
+    100vw - calc(100vw * 48 / 375) - calc(100vw * 16 / 375) - calc(100vw * 40 / 375)
+  ); /* avatar width + gap + padding */
 }
 
 .video-desc {
-  font-family: 'Archivo', sans-serif;
-  font-size: calc(100vw * 14 / 375);
+  font-family: "Poppins", sans-serif;
+  font-size: calc(100vw * 13 / 375);
   font-weight: 400;
   letter-spacing: 0px;
   line-height: calc(100vw * 15.23 / 375);
   color: rgba(255, 255, 255, 1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: calc(100vw - calc(100vw * 48 / 375) - calc(100vw * 16 / 375) - calc(100vw * 40 / 375)); /* avatar width + gap + padding */
+  /* white-space: nowrap; */
+  /* overflow: hidden;
+  text-overflow: ellipsis; */
+  max-width: calc(
+    100vw - calc(100vw * 48 / 375) - calc(100vw * 16 / 375) - calc(100vw * 40 / 375)
+  ); /* avatar width + gap + padding */
 }
 
 .action-buttons {
-  position: absolute;
-  bottom: calc(100vh * 86 / 812);
-  right: calc(100vw * 20 / 375);
+  /* position: absolute; */
+  /* bottom: calc(100vh * 86 / 812);
+  right: calc(100vw * 20 / 375); */
+  /* display: flex;
+  gap: calc(100vh * 14 / 812); */
+  pointer-events: auto;
   display: flex;
-  gap: calc(100vh * 14 / 812);
+  flex-direction: row; /* 横向排列（默认值，可省略） */
+  align-items: center; /* 垂直居中对齐 */
+  justify-content: space-around;
 }
 
 .action-button {
-  width: calc(100vw * 91 / 375);
-  height: calc(100vh * 39 / 812);
-  border-radius: calc(100vw * 40 / 375);
-  background: rgba(255, 255, 255, 0.4);
-  box-shadow: inset calc(100vw * -1 / 375) calc(100vw * -1 / 375) calc(100vw * 1 / 375) rgba(255, 255, 255, 0.6), inset calc(100vw * 1 / 375) calc(100vw * 1 / 375) calc(100vw * 1 / 375) rgba(255, 255, 255, 0.5);
+  width: calc(100vh * 160 / 812);
+  height: calc(100vh * 57 / 812);
+  border-radius: calc(100vw * 20 / 375);
+  background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(calc(100vw * 10 / 375));
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: calc(100vw * 10 / 375);
+  gap: calc(100vw * 6 / 375);
 }
 
 .action-button img {
-  width: calc(100vw * 24 / 375);
-  height: calc(100vw * 24 / 375);
+  width: calc(100vw * 40 / 375);
+  height: calc(100vw * 40 / 375);
+  transform: translateY(-25px); /* 向上移动10px */
 }
 
 .action-button span {
-  font-family: 'Archivo', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-size: calc(100vw * 16 / 375);
-  font-weight: 400;
+  font-weight: 700;
   line-height: calc(100vw * 17.41 / 375);
   color: rgba(255, 255, 255, 1);
+  transform: translateY(-25px); /* 向上移动10px */
 }
 
 .comment-overlay {
