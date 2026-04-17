@@ -7,10 +7,10 @@
 <script setup>
 // 导入 assets 图片
 import backImage from "../assets/back.png";
-import { useRouter } from "vue-router";
+// import { useRouter } from "vue-router";
 import { goBackOrClose } from "@/utils/iosBridge";
 
-const router = useRouter();
+// const router = useRouter();
 
 function handleBack() {
   // 判断历史栈长度，优先返回上一页

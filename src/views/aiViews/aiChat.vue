@@ -126,6 +126,7 @@ async function handleMessageClick(message) {
       uiStore.showToast(res.data.message);
     }
   } catch (err) {
+    print(err);
     uiStore.hideLoading();
     uiStore.showToast("Network error");
   }
@@ -172,6 +173,7 @@ async function sendMessage() {
       uiStore.showToast(res.data.message);
     }
   } catch (err) {
+    print(err);
     uiStore.hideLoading();
     uiStore.showToast("Network error");
   }

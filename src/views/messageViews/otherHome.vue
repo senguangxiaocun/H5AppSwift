@@ -129,7 +129,7 @@ import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user";
 import { usePostStore } from "@/stores/post";
-import { useOtherStore } from "@/stores/other";
+// import { useOtherStore } from "@/stores/other";
 import { useCurrentUserStore } from "@/stores/currentUser";
 import { useUIStore } from "@/stores/ui";
 import { useChatsStore } from "@/stores/chat";
@@ -162,7 +162,7 @@ const currentUser = computed(() => {
 // 用户帖子列表
 const postStore = usePostStore();
 const userPosts = computed(() => postStore.getPostsByUserId(userId));
-const otherStore = useOtherStore();
+// const otherStore = useOtherStore();
 const currentUserStore = useCurrentUserStore();
 const uiStore = useUIStore();
 const chatStore = useChatsStore();

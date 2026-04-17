@@ -55,7 +55,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { useOtherStore } from "@/stores/other";
+// import { useOtherStore } from "@/stores/other";
 import { useUIStore } from "@/stores/ui";
 import { usePostStore } from "@/stores/post";
 import { useCurrentUserStore } from "@/stores/currentUser";
@@ -73,9 +73,9 @@ function showGoToLoginPost() {
 }
 
 const text = ref("");
-const selectedTheme = ref(0);
+// const selectedTheme = ref(0);
 
-const otherStore = useOtherStore();
+// const otherStore = useOtherStore();
 const uiStore = useUIStore();
 const postStore = usePostStore();
 const currentUserStore = useCurrentUserStore();

@@ -54,7 +54,7 @@ import { useUserStore } from "@/stores/user";
 import { useCurrentUserStore } from "@/stores/currentUser";
 import { useUIStore } from "@/stores/ui";
 import { usePostStore } from "@/stores/post";
-import ReportDialog from "@/components/reportChoose.vue";
+// import ReportDialog from "@/components/reportChoose.vue";
 import Empty from "@/components/empty.vue";
 import { sendShowToastToIOS } from "@/utils/iosBridge";
 
@@ -125,13 +125,13 @@ function sendComment() {
   comments.value = commentsStore.getCommentsById(postId);
 }
 
-const emit = defineEmits(["openCommentReport"]);
+// const emit = defineEmits(["openCommentReport"]);
 
 // 打开帖子举报
-function openComment(userId) {
-  reportCommentUserId.value = userId;
-  emit("openCommentReport");
-}
+// function openComment(userId) {
+//   reportCommentUserId.value = userId;
+//   emit("openCommentReport");
+// }
 
 //帖子举报、拉黑
 const reportCommentUserId = ref(null);

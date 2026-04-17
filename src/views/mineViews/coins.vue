@@ -56,7 +56,7 @@ import { ref } from "vue";
 import BackButton from "@/components/back.vue";
 import { useOtherStore } from "@/stores/other";
 import { useCurrentUserStore } from "@/stores/currentUser";
-import { useUserStore } from "@/stores/user";
+// import { useUserStore } from "@/stores/user";
 import { sendPaymentToIOS, sendShowToastToIOS } from "@/utils/iosBridge";
 
 // 游客购买限制
@@ -70,7 +70,7 @@ function showGoToLoginPay(item) {
 
 const otherStore = useOtherStore();
 const currentUserStore = useCurrentUserStore();
-const userStore = useUserStore();
+// const userStore = useUserStore();
 
 const selectedIndex = ref(-1);
 

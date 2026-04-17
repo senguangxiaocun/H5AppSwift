@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { useCurrentUserStore } from "@/stores/currentUser";
 import { useUserStore } from "@/stores/user";
 import { useUIStore } from "@/stores/ui";
