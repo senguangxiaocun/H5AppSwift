@@ -43,7 +43,7 @@
           <div class="label">Birthday</div>
           <div class="input-box birthday-content" @click="openBirthdayPicker">
             <div class="birthday-input">{{ birthday }}</div>
-            <div class="birthday-icon"></div>
+            <!-- <div class="birthday-icon"></div> -->
           </div>
           <input
             ref="birthdayInput"
@@ -310,14 +310,14 @@ const saveProfile = async () => {
   height: 0;
 }
 
-.birthday-icon {
+/* .birthday-icon {
   width: calc(100vw * 19 / 375);
   height: calc(100vh * 19 / 812);
   background-image: url("@/assets/birthdayicon.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-}
+} */
 
 .input-box input {
   width: 100%;
