@@ -41,19 +41,16 @@
       <div class="third">
         <div class="third-section">
           <div class="label">Birthday</div>
-          <div class="input-box birthday-content" @click="openBirthdayPicker">
-            <div class="birthday-input">{{ birthday }}</div>
-            <!-- <div class="birthday-icon"></div> -->
+          <!-- 生日选择 -->
+          <div class="date-wrapper">
+            <input
+              ref="birthdayInput"
+              type="date"
+              v-model="birthday"
+              :max="maxBirthday"
+              class="date-input"
+            />
           </div>
-          <input
-            ref="birthdayInput"
-            v-model="birthday"
-            :max="maxBirthday"
-            class="birthday-native-input"
-            type="date"
-            lang="en-US"
-            @click.stop
-          />
         </div>
       </div>
       <div class="third">
@@ -130,20 +127,20 @@ const chooseAvatar = () => {
   }
 };
 
-const openBirthdayPicker = () => {
-  const input = birthdayInput.value;
-  if (!input) return;
+// const openBirthdayPicker = () => {
+//   const input = birthdayInput.value;
+//   // if (!input) return;
 
-  if (birthday.value > maxBirthday) {
-    birthday.value = maxBirthday;
-  }
+//   if (birthday.value > maxBirthday) {
+//     birthday.value = maxBirthday;
+//   }
 
-  if (typeof input.showPicker === "function") {
-    input.showPicker();
-  } else {
-    input.click();
-  }
-};
+//   if (typeof input.showPicker === "function") {
+//     input.showPicker();
+//   } else {
+//     input.click();
+//   }
+// };
 
 const onFileChange = (e) => {
   const file = e.target.files[0];
@@ -192,11 +189,29 @@ const saveProfile = async () => {
 </script>
 
 <style scoped>
+.date-wrapper {
+  display: inline-flex; /* ✅ 宽度自适应内容 */
+  align-items: center; /* ✅ 垂直居中 */
+  height: calc(100vw * 54 / 375);
+  background-color: rgba(245, 245, 245, 1);
+  padding: 0 calc(100vw * 8 / 375); /* 可选：左右留点空间 */
+  border-radius: calc(100vw * 12 / 375); /* 可选：更现代一点 */
+}
+
+.date-input {
+  border: none;
+  outline: none;
+  background: transparent; /* ✅ 让背景透出来 */
+  height: 100%;
+  font-size: calc(100vw * 14 / 375);
+  color: rgba(31, 40, 0, 0.6);
+}
+
 .page {
   width: 100%;
   height: 100vh;
   background: url("@/assets/pagebgc.png") no-repeat center center;
-  background-color: #ff6161;
+  background-color: #000000;
   background-size: cover;
   overflow: hidden;
   display: flex;
@@ -304,7 +319,7 @@ const saveProfile = async () => {
 
 .birthday-native-input {
   position: absolute;
-  opacity: 0;
+  /* opacity: 0; */
   pointer-events: none;
   width: 0;
   height: 0;
