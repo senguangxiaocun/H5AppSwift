@@ -12,11 +12,12 @@
         <div class="bottom-container">
           <div class="bottom-title">Vabe AI</div>
           <div class="bottom-text">
-            Hi! I’m Kico, your friendly AI companion here to chat about all your passions
-            and interests. Whether you love fashion, art, music, or anything in between,
-            I’m here to explore ideas, share tips, and keep the conversation fun and
-            inspiring. Ready to dive into your favorite hobbies together? Let’s talk and
-            discover something new every day!
+            Hi! I’m Vabe, your dedicated fitness AI buddy here to talk all things workout
+            and wellness. Whether you love strength training, cardio, yoga, sports or any
+            fitness routine you’re into, I’m here to craft workout plans, share training
+            tips, break down fitness knowledge and keep every chat motivating. Ready to
+            level up your fitness journey together? Let’s chat and hit new personal bests
+            every single day!
           </div>
           <!-- 购买 -->
           <div class="purchase-container" @click="showGoToLoginAi">
@@ -175,7 +176,7 @@ function handleRechargeEvent(value) {
   letter-spacing: 0;
   color: rgba(74, 32, 25, 1);
   text-align: center;
-  margin: calc(100vw * 10 / 375) calc(100vw * 50 / 375) calc(100vw * 100 / 375)
+  margin: calc(100vw * 10 / 375) calc(100vw * 50 / 375) calc(100vw * 60 / 375)
     calc(100vw * 50 / 375); /* horizontal padding */
 }
 

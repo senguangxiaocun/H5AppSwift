@@ -88,7 +88,7 @@ const bottomItems = ref([
   {
     sendId: "0",
     time: getFirstTime(),
-    message: "Hi there! I’m Kico, your AI buddy for all things fun and creative.",
+    message: "Hi! I'm Vabe. Do you have any questions?",
   },
 ]);
 
